@@ -1,35 +1,35 @@
 import { Module } from '@nestjs/common';
 import { MailService } from './mail.service';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(), // Load configuration
     MailerModule.forRootAsync({
-      useFactory: async (config: ConfigService) => ({
+      useFactory: async (configService: ConfigService) => ({
         transport: {
-          host: config.get<string>('MAILER_HOST'),
-          secure: false,
+          host: configService.get<string>('MAILER_HOST'),
+          port: configService.get<number>('MAILER_PORT', 587), // Adjust the port if needed
+          secure: false, // You can set this to true if needed
           auth: {
-            user: config.get<string>('MAILDEV_USER'),
-            pass: config.get<string>('MAILDEV_PASS'),
+            user: configService.get<string>('MAILER_USER'),
+            pass: configService.get<string>('MAILER_PASS'),
           },
         },
         defaults: {
-          from: `"Term Project Store " <${config.get('MAILER_HOST')}>`
+          from: `"Installment Payment" <${configService.get('MAILER_USER')}>`,
         },
         template: {
           dir: join(__dirname, 'templates'),
           adapter: new HandlebarsAdapter(),
-          template: 'confirmation',
           options: {
             strict: true,
           },
         },
       }),
-      inject: [ConfigService]
+      inject: [ConfigService],
     }),
   ],
   providers: [MailService],
