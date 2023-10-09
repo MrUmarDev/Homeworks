@@ -1,24 +1,30 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNumber, IsOptional, IsString } from "class-validator";
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
 
 export class FindProductDto {
-    @ApiProperty({example: "Iron", description: "Product name"})
-    @IsOptional()
-    @IsString()
-    name: string;
-    @ApiProperty({example: "This is Iron", description: "Product description"})
-    @IsOptional()
-    @IsString()
-    description: string;
-    @ApiProperty({example: 5000, description: "Product price"})
-    @IsOptional()
+    @ApiPropertyOptional({ example: 1, description: "Unique Id" })
     @IsNumber()
-    min_price: number;
-    // @IsOptional()
-    // @IsNumber()
-    // max_price: number;
-    @ApiProperty({example: 1, description: "Category id"})
     @IsOptional()
+    productID?: number;
+
+    @ApiPropertyOptional({ example: "Phone", description: "Product name" })
+    @IsString()
+    @IsOptional()
+    name?: string;
+
+    @ApiPropertyOptional({ example: "This Phone is Black", description: "Product description" })
+    @IsString()
+    @IsOptional()
+    description?: string;
+
+    @ApiPropertyOptional({ example: 5000, description: "Product price" })
     @IsNumber()
-    category_id: number;
+    @IsOptional()
+    price?: number;
+
+    @ApiPropertyOptional({ example: "http://example.com/image.jpg", description: "Image URL" })
+    @IsString()
+    @IsUrl()
+    @IsOptional()
+    imageURL?: string;
 }

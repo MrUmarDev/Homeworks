@@ -1,59 +1,68 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Product } from './models/product.model';
+import { CreateProductDto } from './dto/create-product.dto'
+import { UpdateProductDto } from './dto/update-product.dto';
 import { FindProductDto } from './dto/find-product.dto';
-import { Op } from 'sequelize';
 
 @Injectable()
 export class ProductService {
-  constructor(@InjectModel(Product) private productRepository: typeof Product) {}
+  constructor(
+      @InjectModel(Product)
+      private productModel: typeof Product,
+  ) {}
 
-  async create(createProductDto: CreateProductDto) {
-    const product = await this.productRepository.findOne({where: {name: createProductDto.name}})
-    if (product) { throw new BadRequestException('Product already exists')}
-    return this.productRepository.create(createProductDto);
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+    return this.productModel.create(createProductDto);
   }
 
-  async findAll(findProductDto: FindProductDto) {
-    let where = {}
+  async findAll(findProductDto: FindProductDto): Promise<Product[]> {
+    const { name, description, price, imageURL } = findProductDto;
 
-    if (findProductDto.name) { where['name'] = { [Op.like]: `%${findProductDto.name}%`}}
-    
-    if (findProductDto.min_price) {
-      where = {
-        ...where,
-        price: {
-          [Op.gt]: findProductDto.min_price
-        }
-      }
-    }
-    if (findProductDto.description) { where['description'] = { [Op.like]: `%${findProductDto.description}%`}}
-    if (findProductDto.category_id) {
-      where = {
-        ...where,
-        category_id: {
-          [Op.lt]: findProductDto.category_id
-        }
-      }
+    const where = {} as any;
+
+    if (name) {
+      where.name = name;
     }
 
-    return this.productRepository.findAll({where, include: {all: true}});
+    if (description) {
+      where.description = description;
+    }
+
+    if (price) {
+      where.price = price;
+    }
+
+    if (imageURL) {
+      where.imageURL = imageURL;
+    }
+
+    return this.productModel.findAll({
+      where,
+    });
   }
 
-  findOne(id: number) {
-    return this.productRepository.findByPk(id, {include: {all: true}});
+  async findOne(id: number): Promise<Product> {
+    const product = await this.productModel.findByPk(id);
+
+    if (!product) {
+      throw new NotFoundException(`Product with id ${id} not found.`);
+    }
+
+    return product;
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return this.productRepository.update(
-      {...updateProductDto},
-      {where: {id}, returning: true}
-    );
+  async update(id: number, updateProductDto: UpdateProductDto): Promise<Product> {
+    const product = await this.findOne(id);
+
+    await product.update(updateProductDto);
+
+    return product;
   }
 
-  remove(id: number) {
-    return this.productRepository.destroy({where: {id}});
+  async remove(id: number): Promise<void> {
+    const product = await this.findOne(id);
+
+    await product.destroy();
   }
 }

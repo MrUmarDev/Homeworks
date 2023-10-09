@@ -1,50 +1,40 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
-import { Category } from "../../category/models/category.model";
-import { CustomerProduct } from "../../customer_product/models/customer_product.model";
+import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 interface IProduct {
+    productID: number;
     name: string;
     description: string;
     price: number;
-    category_id: number;
-    status: string;
+    imageURL: string;
 }
 
-@Table({tableName: "product"})
+@Table({ tableName: "product" })
 export class Product extends Model<Product, IProduct> {
-    @ApiProperty({example: 1, description: "Unique Id"})
+    @ApiProperty({ example: 1, description: "Unique Id" })
     @Column({
         type: DataType.INTEGER,
         primaryKey: true,
         autoIncrement: true
-    }) id: number;
+    }) productID: number;
 
-    @ApiProperty({example: "Iron", description: "Product name"})
+    @ApiProperty({ example: "Phone", description: "Product name" })
     @Column({
         type: DataType.STRING,
     }) name: string;
-    @ApiProperty({example: "This is Iron", description: "Product description"})
-    @Column({ 
+
+    @ApiProperty({ example: "This Phone is Black", description: "Product description" })
+    @Column({
         type: DataType.TEXT,
     }) description: string;
-    @ApiProperty({example: 5000, description: "Product price"})
-    @Column({
-        type: DataType.BIGINT,
-    }) price: number;
-    @ApiProperty({example: 1, description: "Category id"})
-    @ForeignKey(() => Category)
-    @Column({
-        type: DataType.INTEGER, onDelete: "CASCADE"
-    }) category_id: number;
-    @BelongsTo(() => Category)
-    category: Category;
-    @ApiProperty({example: true, description: "Product status"})
-    @Column({
-        type: DataType.BOOLEAN,
-        defaultValue: true
-    }) status: boolean;
 
-    @HasMany(() => CustomerProduct)
-    customer_product: CustomerProduct;
+    @ApiProperty({ example: 5000.0, description: "Product price" })
+    @Column({
+        type: DataType.DECIMAL(10, 2),
+    }) price: number;
+
+    @ApiProperty({ example: "http://example.com/image.jpg", description: "Image URL" })
+    @Column({
+        type: DataType.STRING,
+    }) imageURL: string;
 }

@@ -1,22 +1,30 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { AdminModule } from './admin/admin.module';
-import { MailModule } from './mail/mail.module';
-import { Admin } from './admin/models/admin.model';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { CustomerModule } from './customer/customer.module';
-import { Customer } from './customer/models/customer.model';
-import { AdminGuard } from './guards/admin.guard';
-import { AdminService } from './admin/admin.service';
-import { CategoryModule } from './category/category.module';
-import { Category } from './category/models/category.model';
-import { ProductModule } from './product/product.module';
-import { Product } from './product/models/product.model';
-import { CustomerProductModule } from './customer_product/customer_product.module';
-import { CustomerProduct } from './customer_product/models/customer_product.model';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { resolve } from 'path';
 
-const {env} = process;
+import { MailModule } from './mail/mail.module';
+import { AdminGuard } from './guards/admin.guard';
+import { AdminService } from './users/admin/admin.service';
+
+import { AdminModule } from './users/admin/admin.module';
+import { CustomerModule } from './users/customer/customer.module';
+import { ProductModule } from './product/product.module';
+import { FilesModule } from './files/files.module';
+import { PaymentModule } from './payments/payment.module';
+import { InstallmentModule } from './installment/installment.module';
+
+import { Admin } from './users/admin/models/admin.model';
+import { Customer } from './users/customer/models/customer.model';
+import { Product } from './product/models/product.model';
+import { Payment } from './payments/models/payment.model';
+import { Installment } from './installment/models/installment.model';
+import {Seller} from "./users/seller/models/seller.model";
+import {SellerModule} from "./users/seller/seller.module";
+
+const { env } = process;
 
 @Module({
   imports: [
@@ -27,26 +35,31 @@ const {env} = process;
     JwtModule.register({}),
     SequelizeModule.forRoot({
       dialect: 'postgres',
-      uri: env.DB_URI,
       autoLoadModels: true,
       logging: false,
       models: [
-        Product,
         Admin,
         Customer,
-        Category,
-        CustomerProduct
+        Seller,
+        Product,
+        Payment,
+        Installment,
       ],
     }),
+    ServeStaticModule.forRoot({
+      rootPath: resolve(__dirname, 'static'),
+    }),
     AdminModule,
-    MailModule,
     CustomerModule,
-    CategoryModule,
+    SellerModule,
     ProductModule,
-    CustomerProductModule
+    FilesModule,
+    PaymentModule,
+    MailModule,
+    InstallmentModule,
   ],
   controllers: [],
-  providers: [JwtService],
-  exports: []
+  providers: [AdminGuard, AdminService],
+  exports: [],
 })
 export class AppModule {}

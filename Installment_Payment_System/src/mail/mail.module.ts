@@ -6,13 +6,13 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(), // Load configuration
+    ConfigModule.forRoot(),
     MailerModule.forRootAsync({
       useFactory: async (configService: ConfigService) => ({
         transport: {
           host: configService.get<string>('MAILER_HOST'),
-          port: configService.get<number>('MAILER_PORT', 587), // Adjust the port if needed
-          secure: false, // You can set this to true if needed
+          port: configService.get<number>('MAILER_PORT', 587),
+          secure: false,
           auth: {
             user: configService.get<string>('MAILER_USER'),
             pass: configService.get<string>('MAILER_PASS'),
