@@ -21,10 +21,15 @@ export class CreateAdminDto {
 
     @ApiProperty({ example: "superadmin", description: "Admin role (superadmin or admin)" })
     @IsEnum(AdminRole)
-    role: AdminRole;
+    role: AdminRole.SUPERADMIN;
 
     @ApiProperty({ example: "password123", description: "Admin password (min length: 6)" })
     @IsString()
     @MinLength(6)
     password: string;
+
+    @ApiProperty({ example: "password123", description: "Admin password (min length: 6)" })
+    @IsString()
+    @MinLength(6)
+    confirm_password: string;
 }

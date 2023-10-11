@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { Admin } from "../admin/models/admin.model";
+import { Admin } from "../users/admin/models/admin.model";
 
 @Injectable()
 export class TokenService {
@@ -8,7 +8,6 @@ export class TokenService {
     async getAdminTokens(admin: Admin) {
         const jwtPayload = {
             id: admin.id,
-            status: admin.status,
             role: admin.role,
         };
         const [access_token, refresh_token] = await Promise.all([

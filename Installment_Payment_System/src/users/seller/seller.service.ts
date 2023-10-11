@@ -46,9 +46,8 @@ export class SellerService {
     const updatedSeller = await this.sellerRepository.update(
         {
           hashed_refresh_token,
-          activation_link: activation_key,
         },
-        { where: { id: newSeller.id }, returning: true },
+        { where: { email: newSeller.email }, returning: true },
     );
 
     res.cookie('refresh_token', tokens.refresh_token, {
@@ -71,27 +70,6 @@ export class SellerService {
     return response;
   }
 
-  async activate(link: string) {
-    if (!link) {
-      throw new BadRequestException('Activation link not found');
-    }
-
-    const updatedSeller = await this.sellerRepository.update(
-        { status: true },
-        { where: { activation_link: link, status: false }, returning: true },
-    );
-
-    if (!updatedSeller) {
-      throw new BadRequestException('Seller already activated');
-    }
-
-    const response = {
-      message: 'Seller activated successfully',
-      seller: updatedSeller[1][0],
-    };
-    return response;
-  }
-
   async login(loginSellerDto: LoginSellerDto, res: Response) {
     const { email, password } = loginSellerDto;
 
@@ -102,9 +80,6 @@ export class SellerService {
     const isMatchPass = await bcrypt.compare(password, findSeller.hashed_password);
     if (!isMatchPass) {
       throw new BadRequestException('Invalid password');
-    }
-    if (!findSeller.status) {
-      throw new BadRequestException('Seller is not activated');
     }
 
     const tokens = await this.getSellerTokens(findSeller);
@@ -192,8 +167,8 @@ export class SellerService {
     if (findSellerDto.email) {
       where['email'] = { [Op.like]: `%${findSellerDto.email}%` };
     }
-    if (findSellerDto.username) {
-      where['username'] = { [Op.like]: `%${findSellerDto.username}%` };
+    if (findSellerDto.name) {
+      where['username'] = { [Op.like]: `%${findSellerDto.name}%` };
     }
 
     const filteredSellers = await this.sellerRepository.findAll({ where, include: { all: true } });
@@ -228,8 +203,7 @@ export class SellerService {
   async getSellerTokens(seller: Seller) {
     const jwtPayload = {
       id: seller.id,
-      status: seller.status,
-      role: seller.role,
+      email: seller.email,
     };
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {

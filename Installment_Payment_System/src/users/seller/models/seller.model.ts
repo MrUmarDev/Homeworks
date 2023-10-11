@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 interface ISeller {
-    id: number;
+    sellerID: number;
     name: string;
     email: string;
     photoURL: string;
@@ -17,7 +17,7 @@ export class Seller extends Model<Seller, ISeller> {
         type: DataType.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-    }) id: number;
+    }) sellerID: number;
 
     @ApiProperty({ example: "Tom Bill", description: "Seller name" })
     @Column({

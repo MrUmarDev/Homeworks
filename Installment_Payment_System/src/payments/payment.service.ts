@@ -11,7 +11,7 @@ export class PaymentService {
   constructor(@InjectModel(Payment) private paymentRepository: typeof Payment) {}
 
   async create(createPaymentDto: CreatePaymentDto) {
-    const payment = await this.paymentRepository.findOne({ where: { name: createPaymentDto.name } });
+    const payment = await this.paymentRepository.findOne({ where: { planID: createPaymentDto.planID } });
     if (payment) {
       throw new BadRequestException('Payment already exists');
     }
@@ -21,26 +21,26 @@ export class PaymentService {
   async findAll(findPaymentDto: FindPaymentDto) {
     let where = {};
 
-    if (findPaymentDto.name) {
-      where['name'] = { [Op.like]: `%${findPaymentDto.name}%` };
+    if (findPaymentDto.planID) {
+      where['planID'] = { [Op.like]: `%${findPaymentDto.planID}%` };
     }
 
-    if (findPaymentDto.min_price) {
+    if (findPaymentDto.planID) {
       where = {
         ...where,
-        price: {
-          [Op.gt]: findPaymentDto.min_price,
+        planID: {
+          [Op.gt]: findPaymentDto.planID,
         },
       };
     }
-    if (findPaymentDto.description) {
-      where['description'] = { [Op.like]: `%${findPaymentDto.description}%` };
+    if (findPaymentDto.planID) {
+      where['planID'] = { [Op.like]: `%${findPaymentDto.planID}%` };
     }
-    if (findPaymentDto.category_id) {
+    if (findPaymentDto.planID) {
       where = {
         ...where,
-        category_id: {
-          [Op.lt]: findPaymentDto.category_id,
+        planID: {
+          [Op.lt]: findPaymentDto.planID,
         },
       };
     }

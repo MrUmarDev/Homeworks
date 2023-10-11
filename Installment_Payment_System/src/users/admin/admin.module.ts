@@ -5,6 +5,7 @@ import { AdminService } from './admin.service';
 import { AdminController } from './admin.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { MailModule } from '../../mail/mail.module';
+import {AdminGuard} from "../../guards/admin.guard";
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { MailModule } from '../../mail/mail.module';
     MailModule,
   ],
   controllers: [AdminController],
-  providers: [AdminService],
-  exports: [AdminService, JwtModule],
+  providers: [AdminService, AdminGuard],
+  exports: [AdminService],
 })
 export class AdminModule {}

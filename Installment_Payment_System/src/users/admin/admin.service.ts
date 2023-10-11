@@ -22,13 +22,15 @@ export class AdminService {
       private readonly jwtService: JwtService,
   ) {}
 
+
+
   async registration(createAdminDto: CreateAdminDto, res: Response) {
     const findAdmin = await this.adminRepository.findOne({ where: { username: createAdminDto.username } });
     if (findAdmin) {
       throw new BadRequestException('This Username Already Registered!');
     }
 
-    if (createAdminDto.password !== createAdminDto.confirm_password) {
+    if (createAdminDto.password !== createAdminDto.confirm_password) { // Corrected comparison here
       throw new BadRequestException('Passwords do not match');
     }
 
@@ -48,7 +50,7 @@ export class AdminService {
           hashed_refresh_token,
           activation_link: activation_key,
         },
-        { where: { id: newAdmin.id }, returning: true },
+        { where: { email: newAdmin.email }, returning: true },
     );
 
     res.cookie('refresh_token', tokens.refresh_token, {
@@ -71,27 +73,6 @@ export class AdminService {
     return response;
   }
 
-  async activate(link: string) {
-    if (!link) {
-      throw new BadRequestException('Activation link not found');
-    }
-
-    const updatedAdmin = await this.adminRepository.update(
-        { status: true },
-        { where: { activation_link: link, status: false }, returning: true },
-    );
-
-    if (!updatedAdmin) {
-      throw new BadRequestException('Admin already activated');
-    }
-
-    const response = {
-      message: 'Admin activated successfully',
-      admin: updatedAdmin[1][0],
-    };
-    return response;
-  }
-
   async login(loginAdminDto: LoginAdminDto, res: Response) {
     const { username, password } = loginAdminDto;
 
@@ -102,9 +83,6 @@ export class AdminService {
     const isMatchPass = await bcrypt.compare(password, findAdmin.hashed_password);
     if (!isMatchPass) {
       throw new BadRequestException('Admin is not Found');
-    }
-    if (!findAdmin.status) {
-      throw new BadRequestException('Admin is not activated');
     }
 
     const tokens = await this.getAdminTokens(findAdmin);
@@ -228,8 +206,7 @@ export class AdminService {
   async getAdminTokens(admin: Admin) {
     const jwtPayload = {
       id: admin.id,
-      status: admin.status,
-      role: admin.role,
+      email: admin.email,
     };
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {

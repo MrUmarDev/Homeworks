@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { Seller } from "../seller/models/seller.model";
+import { Seller } from "../users/seller/models/seller.model";
 
 @Injectable()
 export class SellerGuard implements CanActivate {

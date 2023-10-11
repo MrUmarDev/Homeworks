@@ -21,4 +21,9 @@ export class CreateSellerDto {
     @IsString()
     @IsNotEmpty()
     password: string;
+
+    @ApiProperty({ example: 'confirm-password123', description: 'Confirmation password' })
+    @IsNotEmpty()
+    @IsString()
+    confirm_password: string;
 }

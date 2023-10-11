@@ -19,7 +19,7 @@ export class CreateCustomerDto {
 
     @ApiProperty({ example: '1234567890', description: 'Phone number of the customer' })
     @IsNotEmpty()
-    @IsPhoneNumber('any', { message: 'Invalid phone number' })
+    @IsPhoneNumber('UZ', { message: 'Invalid phone number' })
     phone: string;
 
     @ApiProperty({ example: '123 Main St, City, Country', description: 'Address of the customer' })

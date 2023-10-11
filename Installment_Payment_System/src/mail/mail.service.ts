@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { Admin } from '../admin/models/admin.model';
-import { Customer } from '../customer/models/customer.model';
-import { Seller } from '../seller/models/seller.model';
+import { Admin } from '../users/admin/models/admin.model';
+import { Customer } from '../users/customer/models/customer.model';
+import { Seller } from '../users/seller/models/seller.model';
 import { MailerService } from '@nestjs-modules/mailer';
 
 const { env } = process;
@@ -24,26 +24,26 @@ export class MailService {
   };
 
   sendCustomerConfirmation = async (customer: Customer): Promise<void> => {
-    const activation_url = `${env.API_HOST}/api/customer/activate/${customer.activation_link}`;
+    const activation_url = `${env.API_HOST}/api/customer/activate/${customer.email}`;
     await this.mailService.sendMail({
       to: customer.email,
       subject: "This is from Installment Payment. Welcome! Please confirm your email",
       template: './confirmation',
       context: {
-        name: customer.username,
+        name: customer.firstName,
         url: activation_url,
       },
     });
   };
 
   sendSellerConfirmation = async (seller: Seller): Promise<void> => {
-    const activation_url = `${env.API_HOST}/api/seller/activate/${seller.activation_link}`;
+    const activation_url = `${env.API_HOST}/api/seller/activate/${seller.email}`;
     await this.mailService.sendMail({
       to: seller.email,
       subject: "This is from Installment Payment. Welcome! Please confirm your email",
       template: './confirmation',
       context: {
-        name: seller.username,
+        name: seller.name,
         url: activation_url,
       },
     });

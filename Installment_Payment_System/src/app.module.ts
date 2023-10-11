@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtService, JwtModule } from '@nestjs/jwt';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { resolve } from 'path';
 
@@ -12,7 +12,6 @@ import { AdminService } from './users/admin/admin.service';
 import { AdminModule } from './users/admin/admin.module';
 import { CustomerModule } from './users/customer/customer.module';
 import { ProductModule } from './product/product.module';
-import { FilesModule } from './files/files.module';
 import { PaymentModule } from './payments/payment.module';
 import { InstallmentModule } from './installment/installment.module';
 
@@ -23,6 +22,7 @@ import { Payment } from './payments/models/payment.model';
 import { Installment } from './installment/models/installment.model';
 import {Seller} from "./users/seller/models/seller.model";
 import {SellerModule} from "./users/seller/seller.module";
+import * as process from "process";
 
 const { env } = process;
 
@@ -35,6 +35,7 @@ const { env } = process;
     JwtModule.register({}),
     SequelizeModule.forRoot({
       dialect: 'postgres',
+      uri: env.DB_URI,
       autoLoadModels: true,
       logging: false,
       models: [
@@ -53,13 +54,12 @@ const { env } = process;
     CustomerModule,
     SellerModule,
     ProductModule,
-    FilesModule,
     PaymentModule,
     MailModule,
     InstallmentModule,
   ],
   controllers: [],
-  providers: [AdminGuard, AdminService],
+  providers: [JwtService],
   exports: [],
 })
 export class AppModule {}

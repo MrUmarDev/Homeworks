@@ -2,14 +2,13 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 interface IAdmin {
-    id: number;
+    adminID: number;
     username: string;
     role: string;
     email: string;
     photoURL: string;
     hashed_password: string;
     hashed_refresh_token: string;
-    activation_link: string;
 }
 
 @Table({ tableName: "admin" })
@@ -19,7 +18,7 @@ export class Admin extends Model<Admin, IAdmin> {
         type: DataType.INTEGER,
         primaryKey: true,
         autoIncrement: true
-    }) id: number;
+    }) adminID: number;
 
     @ApiProperty({ example: "admin123", description: "Admin username" })
     @Column({

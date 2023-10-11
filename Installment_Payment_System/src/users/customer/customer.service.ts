@@ -26,12 +26,12 @@ export class CustomerService {
       createCustomerDto: CreateCustomerDto,
       res: Response,
   ) {
-    const findCustomer = await this.customerRepository.findOne({ where: { username: createCustomerDto.username } });
+    const findCustomer = await this.customerRepository.findOne({ where: { email: createCustomerDto.email } });
     if (findCustomer) {
-      throw new BadRequestException('This Username Already Registered!');
+      throw new BadRequestException('This Email Already Registered!');
     }
 
-    if (createCustomerDto.password !== createCustomerDto.confirm_password) {
+    if (createCustomerDto.password !== createCustomerDto.confirmPassword) {
       throw new BadRequestException('Passwords do not match');
     }
 
@@ -49,9 +49,8 @@ export class CustomerService {
     const updatedCustomer = await this.customerRepository.update(
         {
           hashed_refresh_token,
-          activation_link: activation_key,
         },
-        { where: { id: newCustomer.id }, returning: true }
+        { where: { email: newCustomer.email }, returning: true }
     );
 
     res.cookie('refresh_token', tokens.refresh_token, {
@@ -74,43 +73,19 @@ export class CustomerService {
     return response;
   }
 
-  async activate (link: string){
-    if (!link) {
-      throw new BadRequestException('Activation link not found');
-    }
-
-    const updatedCustomer = await this.customerRepository.update(
-        { status: true },
-        { where: { activation_link: link, status: false }, returning: true }
-    );
-
-    if (!updatedCustomer) {
-      throw new BadRequestException('Customer already activated');
-    }
-
-    const response = {
-      message: 'Customer activated successfully',
-      customer: updatedCustomer[1][0],
-    };
-    return response;
-  }
-
   async login (
       loginCustomerDto: LoginCustomerDto,
       res: Response,
   ) {
-    const { username, password } = loginCustomerDto;
+    const { email, password } = loginCustomerDto;
 
-    const findCustomer = await this.customerRepository.findOne({ where: { username } });
+    const findCustomer = await this.customerRepository.findOne({ where: { email } });
     if (!findCustomer) {
       throw new BadRequestException('Customer is not Found');
     }
     const isMatchPass = await bcrypt.compare(password, findCustomer.hashed_password);
     if (!isMatchPass) {
       throw new BadRequestException('Customer is not Found');
-    }
-    if (!findCustomer.status) {
-      throw new BadRequestException('Customer is not activated');
     }
 
     const tokens = await this.getCustomerTokens(findCustomer);
@@ -205,8 +180,8 @@ export class CustomerService {
     if (findFilteredCustomersDto.email) {
       where['email'] = { [Op.like]: `%${findFilteredCustomersDto.email}%` };
     }
-    if (findFilteredCustomersDto.username) {
-      where['username'] = { [Op.like]: `%${findFilteredCustomersDto.username}%` };
+    if (findFilteredCustomersDto.customerID) {
+      where['customerID'] = { [Op.like]: `%${findFilteredCustomersDto.customerID}%` };
     }
 
     const filteredCustomers = await this.customerRepository.findAll({ where, include: { all: true } });
@@ -236,7 +211,7 @@ export class CustomerService {
   async getCustomerTokens(customer: Customer) {
     const jwtPayload = {
       id: customer.id,
-      status: customer.status,
+      email: customer.email,
     };
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(jwtPayload, {

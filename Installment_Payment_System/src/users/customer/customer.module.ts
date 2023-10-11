@@ -11,13 +11,10 @@ import { CustomerGuard } from '../../guards/customer.guard';
   imports: [
     SequelizeModule.forFeature([Customer]),
     MailModule,
-    JwtModule.register({
-      secret: process.env.ACCESS_TOKEN_KEY,
-      signOptions: { expiresIn: process.env.ACCESS_TOKEN_TIME },
-    }),
+    JwtModule.register({}),
   ],
   providers: [CustomerService, CustomerGuard],
   controllers: [CustomerController],
-  exports: [JwtModule],
+  exports: [CustomerService],
 })
 export class CustomerModule {}

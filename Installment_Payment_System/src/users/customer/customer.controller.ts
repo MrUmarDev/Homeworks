@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, Req } from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, Put, UseGuards, Req, Res} from '@nestjs/common';
 import { CustomerService } from './customer.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -6,6 +6,8 @@ import { FindCustomersDto } from './dto/find-customers.dto';
 import { Customer } from './models/customer.model';
 import { ApiResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CustomerGuard } from '../../guards/customer.guard';
+import {LoginCustomerDto} from "./dto/customer-login.dto";
+import {Response} from "express";
 
 @ApiTags('customer')
 @Controller('customer')
@@ -19,19 +21,15 @@ export class CustomerController {
     return this.customerService.registration(createCustomerDto, req.res);
   }
 
-  @ApiOperation({ summary: 'Activate customer account' })
-  @ApiResponse({ status: 200, type: Customer })
-  @Get('activate/:link')
-  activate(@Param('link') link: string) {
-    return this.customerService.activate(link);
-  }
-
-  @ApiOperation({ summary: 'Log in as a customer' })
+  @ApiOperation({ summary: 'Login customer' })
   @ApiResponse({ status: 200, type: Customer })
   @Post('login')
-  login(@Body() loginCustomerDto: any, @Req() req) {
-    return this.customerService.login(loginCustomerDto, req.res);
-  }
+  async login(
+        @Body() loginCustomerDto: LoginCustomerDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+      return this.customerService.login(loginCustomerDto, res);
+    }
 
   @ApiOperation({ summary: 'Log out as a customer' })
   @ApiResponse({ status: 200, type: Customer })
@@ -64,8 +62,9 @@ export class CustomerController {
   @ApiResponse({ status: 200, type: Customer })
   @UseGuards(CustomerGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.customerService.findOneById(+id);
+  @Get(':id')
+  findOne(@Param('id') id: string, @Req() req: Request) {
+    return this.customerService.findOneById(+id, req);
   }
 
   @ApiOperation({ summary: 'Delete a customer by ID' })

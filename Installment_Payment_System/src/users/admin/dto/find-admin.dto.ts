@@ -1,7 +1,6 @@
 import { ApiPropertyOptional } from "@nestjs/swagger";
 import { IsEmail, IsOptional, IsString, IsEnum } from "class-validator";
 
-
 enum AdminRole {
     SUPERADMIN = "superadmin",
     ADMIN = "admin",
@@ -9,7 +8,7 @@ enum AdminRole {
 
 export class FindAdminDto {
     @ApiPropertyOptional({ example: "superadmin", description: "Filter by admin role" })
-    @IsEnum()
+    @IsEnum(AdminRole)
     @IsOptional()
     role?: AdminRole;
 

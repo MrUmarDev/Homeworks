@@ -1,6 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { Admin } from "../admin/models/admin.model";
+import { Admin } from "../users/admin/models/admin.model";
 
 @Injectable()
 export class AdminGuard implements CanActivate {
@@ -14,7 +14,8 @@ export class AdminGuard implements CanActivate {
             throw new UnauthorizedException('Admin Unauthorized');
         }
 
-        const [bearer, token] = authHeader.split(' ');
+        const bearer = authHeader.split(' ')[0];
+        const token = authHeader.split(' ')[1];
 
         if (bearer !== 'Bearer' || !token) {
             throw new UnauthorizedException('Admin Unauthorized');

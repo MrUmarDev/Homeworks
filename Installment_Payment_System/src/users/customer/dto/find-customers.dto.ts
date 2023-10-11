@@ -23,7 +23,7 @@ export class FindCustomersDto {
 
     @ApiProperty({ example: '+1234567890', description: 'Phone number of the customer' })
     @IsOptional()
-    @IsPhoneNumber('any', { message: 'Invalid phone number format' })
+    @IsPhoneNumber('UZ', { message: 'Invalid phone number format' })
     phone?: string;
 
     @ApiProperty({ example: '123 Main St', description: 'Address of the customer' })

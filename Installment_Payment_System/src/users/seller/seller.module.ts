@@ -11,13 +11,10 @@ import { SellerGuard } from '../../guards/seller.guard';
   imports: [
     SequelizeModule.forFeature([Seller]),
     MailModule,
-    JwtModule.register({
-      secret: process.env.ACCESS_TOKEN_KEY,
-      signOptions: { expiresIn: process.env.ACCESS_TOKEN_TIME },
-    }),
+    JwtModule.register({}),
   ],
   providers: [SellerService, SellerGuard],
   controllers: [SellerController],
-  exports: [JwtModule],
+  exports: [SellerService],
 })
 export class SellerModule {}
