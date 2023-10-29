@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id String @id @default(uuid())
+  first_name String
+  last_name String
+  username String
+  email String @unique
+  hashed_password String
+  hashed_refresh_token String?
+  is_active Boolean?
+  activation_link String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("admin")
+}
+
+model Rieltor {
+  id String @id @default(uuid())
+  first_name String
+  last_name String
+  username String
+  email String @unique
+  hashed_password String
+  hashed_refresh_token String?
+  is_active Boolean?
+  activation_link String?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("rieltor")
+}
