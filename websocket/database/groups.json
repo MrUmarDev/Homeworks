@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Chat1",
+    "id": 1,
+    "author": "Umar",
+    "groupUsers": [
+      "Umar"
+    ]
+  },
+  {
+    "name": "Chat2",
+    "id": 2,
+    "author": "Muxtor",
+    "groupUsers": [
+      "Muxtor"
+    ]
+  },
+  {
+    "name": "Chat3",
+    "id": 3,
+    "author": "Hamdam",
+    "groupUsers": [
+      "Hamdam"
+    ]
+  }
+]
